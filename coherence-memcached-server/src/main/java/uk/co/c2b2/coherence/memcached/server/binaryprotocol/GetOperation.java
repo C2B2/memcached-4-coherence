@@ -19,6 +19,7 @@
 */
 package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
 
+import com.google.gson.Gson;
 import com.tangosol.net.NamedCache;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -79,11 +80,34 @@ class GetOperation implements MemCacheOperation {
         } else if (objectEntry == null) {
             responseHeader.setStatus(ResponseStatus.KEY_NOT_FOUND.status);
             result =  new MemcacheResponse(responseHeader, null);
-        } else {
-            responseHeader.setStatus(ResponseStatus.NOT_SUPPORTED.status);
-            result = new MemcacheResponse(responseHeader, null);
+        } else { // not null or not a CacheEntry // try to JSON serialize
+            responseHeader.setStatus(ResponseStatus.NO_ERROR.status);
+                responseHeader.setExtraLength((byte) 4);
+                responseHeader.setCas(0);
+                
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                DataOutputStream daos = new DataOutputStream(baos);
+                try {
+                    daos.writeInt(0);
+                    
+                    if (keyRequired) {
+                        daos.write(keyBytes);
+                        responseHeader.setKeyLength((short)keyLength);
+                    }
+                    
+                    daos.write(serializeToJSON(objectEntry));
+                    result = new MemcacheResponse(responseHeader, baos.toByteArray());
+                } catch (IOException ioe) {
+                // no way
+                }
         }
         return result;
+    }
+    
+    private byte[] serializeToJSON(Object object) {
+        Gson gson = new Gson();
+        String jsonStr = gson.toJson(object);
+        return jsonStr.getBytes();
     }
     
     protected boolean keyRequired = false;

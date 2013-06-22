@@ -85,6 +85,10 @@ public class MemcachedServer {
           myLogger.info("Bootstrapped Memcached server on port " + myPort + " backed by named cache " + myNamedCache);
     }
     
+    public NamedCache getCache() {
+        return myCache;
+    }
+    
     void bootStrapCache() {
         CacheFactory.ensureCluster();
         myCache = CacheFactory.getCache(myNamedCache);        
