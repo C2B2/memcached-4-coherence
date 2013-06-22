@@ -15,6 +15,8 @@ Oracle Coherence Named Cache.
 
 This code has been tested using the memccapable utility and passes all the tests for binary protocol compliance.
 
+This code is brought to you by <a href="http://www.c2b2.co.uk/oracle_coherence">C2B2 The Leading Independent middleware Experts</a>
+
 
 
 
