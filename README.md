@@ -14,9 +14,9 @@ This will create a memcached server listening on the specified port which will s
 Oracle Coherence Named Cache.
 
 BUILDING INSTRUCTIONS:
-1. Download Oracle Coherence 3.7.1 from <a href="http://www.oracle.com/technetwork/middleware/coherence/downloads/index.html">http://www.oracle.com/technetwork/middleware/coherence/downloads/index.html</a>
-2. Unzip the Coherence archive and install coherence.jar to your local Maven repository by running:
-
+* Download Oracle Coherence 3.7.1 from <a href="http://www.oracle.com/technetwork/middleware/coherence/downloads/index.html">http://www.oracle.com/technetwork/middleware/coherence/downloads/index.html</a>
+* Unzip the Coherence archive and install coherence.jar to your local Maven repository by running:
+<pre>
 mvn install:install-file  \
       -DgroupId=com.oracle.coherence  \
       -DartifactId=coherence  \
@@ -24,9 +24,9 @@ mvn install:install-file  \
       -Dfile=coherence.jar  \
       -Dpackaging=jar \
       -DgeneratePom=true
-
-3. Build the memcached-4-coherence by mvn install
-4. Enjoy!
+</pre>
+* Build the memcached-4-coherence by mvn install
+* Enjoy!
 
 This code has been tested using the memccapable utility and passes all the tests for binary protocol compliance.
 
