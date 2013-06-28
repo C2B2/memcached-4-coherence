@@ -19,31 +19,20 @@
 */
 package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
 
-/**
- *
- * @author steve
- */
-public enum MagicByte {
-    
-    REQUEST((byte)0x80),
-    RESPONSE((byte)0x81),
-    BAD((byte)0xff);
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-    private MagicByte(byte magicByte) {
-        this.magicByte = magicByte;
+public class MagicByteTest {
+
+    @Test
+    public void testRequestMagicByte() {
+        MagicByte requestMagicByte = MagicByte.fromByte((byte)0x80);
+        assertEquals(MagicByte.REQUEST, requestMagicByte);
     }
-    
-    public static MagicByte fromByte(byte val) {
-        MagicByte result = BAD;
-        if (val == (byte)0x80) {
-            result = REQUEST;
-        } else if (val == (byte)0x81) {
-            result = RESPONSE;
-        }
-        return result;
+
+    @Test
+    public void testResponseMagicByte() {
+        MagicByte responseMagicByte = MagicByte.fromByte((byte)0x81);
+        assertEquals(MagicByte.RESPONSE, responseMagicByte);
     }
-    
-    
-    byte magicByte;
-    
 }
