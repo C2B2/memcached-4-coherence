@@ -13,7 +13,9 @@ To use Oracle Coherence as a backing store for memcached add the following two l
 This will create a memcached server listening on the specified port which will store the binary data into the specified
 Oracle Coherence Named Cache.
 
-BUILDING INSTRUCTIONS:
+Building Instructions
+---------------------
+
 * Download Oracle Coherence 3.7.1 from <a href="http://www.oracle.com/technetwork/middleware/coherence/downloads/index.html">http://www.oracle.com/technetwork/middleware/coherence/downloads/index.html</a>
 * Unzip the Coherence archive and install coherence.jar to your local Maven repository by running:
 <pre>
