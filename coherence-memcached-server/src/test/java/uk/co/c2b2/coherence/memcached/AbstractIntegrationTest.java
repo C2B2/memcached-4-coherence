@@ -27,34 +27,38 @@ import uk.co.c2b2.memcached.server.MemcachedServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import org.junit.BeforeClass;
+
 
 public abstract class AbstractIntegrationTest {
 
-    private int DEFAULT_PORT = 10000;
-    private String NAMED_CACHE = "myCache";
+    private static int DEFAULT_PORT = 10000;
+    private static String NAMED_CACHE = "myCache";
 
-    protected MemcachedClient client;
+    protected static MemcachedClient client;
 
-    @Before
-    public void setUp() throws Exception {
-        startMemcachedServer();
-        createClient();
+    @BeforeClass
+    static public void setUp() throws Exception {
+        if (client == null) {
+            startMemcachedServer();
+            createClient();
+        }
     }
 
-    protected void createClient() throws IOException {
+    static protected void createClient() throws IOException {
         BinaryConnectionFactory connectionFactory = new BinaryConnectionFactory();
         client = new MemcachedClient(connectionFactory, Arrays.asList(new InetSocketAddress("localhost", getPort())));
     }
 
-    protected int getPort() {
+    static protected int getPort() {
         return DEFAULT_PORT;
     }
 
-    protected String getCacheName() {
+    static protected String getCacheName() {
         return NAMED_CACHE;
     }
 
-    protected void startMemcachedServer() {
+    static protected void startMemcachedServer() {
         MemcachedServer server = new MemcachedServer(getPort(), getCacheName());
         server.bootStrap();
     }

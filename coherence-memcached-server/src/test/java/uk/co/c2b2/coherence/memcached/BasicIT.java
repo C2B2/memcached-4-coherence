@@ -20,29 +20,146 @@
 package uk.co.c2b2.coherence.memcached;
 
 
-import net.spy.memcached.BinaryConnectionFactory;
-import net.spy.memcached.MemcachedClient;
-import org.junit.Before;
+import net.spy.memcached.internal.OperationFuture;
 import org.junit.Test;
-import uk.co.c2b2.memcached.server.MemcachedServer;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
+import static uk.co.c2b2.coherence.memcached.AbstractIntegrationTest.client;
 
 public class BasicIT extends AbstractIntegrationTest {
 
     @Test
     public void testPutGet() throws Exception {
         String key = "myKey";
-        String object = new String("String Instance 1");
+        String object = "String Instance 1";
         int expiration = 10000;
 
-        client.set(key, expiration, object);
+        boolean setResult = client.set(key, expiration, object).get();
+        assertTrue(setResult);
 
         String result = (String)client.get(key);
         assertEquals(object, result);
     }
+   
+    @Test
+    public void testGetBadKey() throws Exception {
+        String key = "badKey";
+        Object result = client.get(key);
+        assertNull(result);
+    }
+    
+    @Test
+    public void testSetOverwrite() throws Exception {
+        String overWriteKey = "overwriteKey";
+        String value1 = "String Instance 1";
+        String value2 = "String Instance 2";
+        int expiration = 10000;
+        
+        // test initial set
+        boolean setResult = client.set(overWriteKey, expiration, value1).get();
+        assertTrue(setResult);       
+        String result = (String)client.get(overWriteKey);
+        assertEquals(result, value1);
+        
+        // now overwrite the key
+        setResult = client.set(overWriteKey, expiration, value2).get();
+        assertTrue(setResult);
+        result = (String)client.get(overWriteKey);
+        assertEquals(result, value2);
+    }
+    
+    @Test 
+    public void testAdd() throws Exception {
+        String addKey = "addKey";
+        String value = "AddValue";
+        int expiration = 10000;
+        
+        boolean addResult = client.add(addKey, expiration, value).get();
+        assertTrue(addResult); 
+        String result = (String)client.get(addKey);
+        assertEquals(result, value);
+    }
+    
+    @Test 
+    public void testDoubleAdd() throws Exception {
+        String addKey = "doubleAddKey";
+        String value = "AddValue";
+        String value2 = "AddValue2";
+        int expiration = 10000;
+        
+        boolean addResult = client.add(addKey, expiration, value).get();
+        assertTrue(addResult); 
+        String result = (String)client.get(addKey);
+        assertEquals(result, value);
+        
+        // second add should fail as the key value already exists
+        addResult = client.add(addKey, expiration, value).get();
+        assertFalse(addResult); 
+        result = (String)client.get(addKey);
+        assertEquals(result, value);
+    }
+    
+    @Test
+    public void testReplace() throws Exception {
+        String key = "testReplace";
+        String value1 = "SetValue";
+        String value2 = "ReplaceValue";
+        int expiration = 10000;   
+        
+         // test initial set
+        boolean setResult = client.set(key, expiration, value1).get();
+        assertTrue(setResult);       
+        String result = (String)client.get(key);
+        assertEquals(result, value1);
+        
+        // test replace
+        boolean replaceResult = client.replace(key, expiration, value2).get();
+        assertTrue(replaceResult);       
+        result = (String)client.get(key);
+        assertEquals(result, value2);
+    }
+    
+    @Test
+    public void testReplaceWithoutSet() throws Exception {
+        String key = "testReplaceWithoutSet";
+        String value = "ReplaceValue";
+        int expiration = 10000;   
+        
+        // test replace
+        boolean replaceResult = client.replace(key, expiration, value).get();
+        assertFalse(replaceResult);       
+        String result = (String)client.get(key);
+        assertNull(result);
+    }
+    
+    @Test
+    public void testDelete() throws Exception {
+        String key = "testDelete";
+        String value1 = "DeleteValue";
+        int expiration = 10000;   
+        
+         // test initial set
+        boolean setResult = client.set(key, expiration, value1).get();
+        assertTrue(setResult);       
+        String result = (String)client.get(key);
+        assertEquals(result, value1);
+        
+        // test delete
+        boolean replaceResult = client.delete(key).get();
+        assertTrue(replaceResult);       
+        result = (String)client.get(key);
+        assertNull(result);
+    }
+    
+    @Test
+    public void testDeleteWithoutSet() throws Exception {
+        String key = "testDeleteWithoutSet";
+        String value = "DeleteValue"; 
+        
+        // test delete
+        boolean deleteResult = client.delete(key).get();
+        assertFalse(deleteResult);       
+    }
+    
+    
 }
