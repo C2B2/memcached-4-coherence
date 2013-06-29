@@ -17,33 +17,26 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
+
+import com.tangosol.net.NamedCache;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 
 /**
  *
  * @author steve
  */
-public enum MagicByte {
-    
-    REQUEST((byte)0x80),
-    RESPONSE((byte)0x81),
-    BAD((byte)0xff);
+class ReplaceQOperation extends ReplaceOperation {
 
-    private MagicByte(byte magicByte) {
-        this.magicByte = magicByte;
-    }
-    
-    public static MagicByte fromByte(byte val) {
-        MagicByte result = BAD;
-        if (val == (byte)0x80) {
-            result = REQUEST;
-        } else if (val == (byte)0x81) {
-            result = RESPONSE;
+    @Override
+    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
+        MemcacheResponse response = super.doOperation(cache, request);
+        response.getHeader().setOpCode(OpCode.REPLACEQ);
+        if (response.getHeader().getReserved() == ResponseStatus.NO_ERROR.status) {
+            response.setDiscard(true);
         }
-        return result;
+        return response;
     }
-    
-    
-    byte magicByte;
-    
 }

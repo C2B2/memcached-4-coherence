@@ -19,21 +19,20 @@
 */
 package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
 
-import com.tangosol.net.NamedCache;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-/**
- *
- * @author steve
- */
-class StatOperation implements MemCacheOperation {
+public class MagicByteTest {
 
-    @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcacheResponse response =  new MemcacheResponse(new MemcachedBinaryHeader(),null);
-        response.getHeader().setOpCode(OpCode.STAT);
-        response.getHeader().setStatus(ResponseStatus.NO_ERROR.status);
-        return response;
+    @Test
+    public void testRequestMagicByte() {
+        MagicByte requestMagicByte = MagicByte.fromByte((byte)0x80);
+        assertEquals(MagicByte.REQUEST, requestMagicByte);
     }
 
-    
+    @Test
+    public void testResponseMagicByte() {
+        MagicByte responseMagicByte = MagicByte.fromByte((byte)0x81);
+        assertEquals(MagicByte.RESPONSE, responseMagicByte);
+    }
 }

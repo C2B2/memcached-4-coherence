@@ -24,8 +24,9 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
-import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemCacheOperation;
-import uk.co.c2b2.coherence.memcached.server.binaryprotocol.SetOperation;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.MemCacheOperation;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.OperationFactory;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.SetOperation;
 
 /**
  *
@@ -34,6 +35,7 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.SetOperation;
 public class MemcachedBinaryProtocolDecoder extends FrameDecoder {
     
     private final NamedCache myCache;
+    private static final int HEADER_SIZE = 24;
     
     public MemcachedBinaryProtocolDecoder(NamedCache cache) {
         myCache = cache;
@@ -42,7 +44,7 @@ public class MemcachedBinaryProtocolDecoder extends FrameDecoder {
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
         // check we have the 
-        if (buffer.readableBytes() < 24) {
+        if (buffer.readableBytes() < HEADER_SIZE) {
             return null;
         }
         
@@ -53,93 +55,8 @@ public class MemcachedBinaryProtocolDecoder extends FrameDecoder {
             return null;
         }
         
-        MemCacheOperation operation = null;        
-        switch (header.getOpCode()) {
-            case GET:
-                operation = new GetOperation();
-                break;
-            case SET:
-                operation = new SetOperation();
-                break;
-            case ADD:
-                operation = new AddOperation();
-                break;
-            case REPLACE:
-                operation = new ReplaceOperation();
-                break;
-            case DELETE:
-                operation = new DeleteOperation();
-                break;
-            case INCREMENT:
-                operation = new IncrementOperation();
-                break;
-            case DECREMENT:
-                operation = new DecrementOperation();
-                break;
-            case QUIT:
-                operation = new QuitOperation();
-                break;
-            case FLUSH:
-                operation = new FlushOperation();
-                break;
-            case GETQ:
-                operation = new GetQOperation();
-                break;
-            case NOOP:
-                operation = new NoOpOperation();
-                break;
-            case VERSION:
-                operation = new VersionOperation();
-                break;
-            case GETK:
-                operation = new GetKOperation();
-                break;
-            case GETKQ:
-                operation = new GetKQOperation();
-                break;
-            case APPEND:
-                operation = new AppendOperation();
-                break;
-            case PREPEND:
-                operation = new PrependOperation();
-                break;
-            case STAT:
-                operation = new StatOperation();
-                break;
-            case SETQ:
-                operation = new SetQOperation();
-                break;
-            case ADDQ:
-                operation = new AddQOperation();
-                break;
-            case REPLACEQ:
-                operation = new ReplaceQOperation();
-                break;
-            case DELETEQ:
-                operation = new DeleteQOperation();
-                break;
-            case INCREMENTQ:
-                operation = new IncrementQOperation();
-                break;
-            case DECREMENTQ:
-                operation = new DecrementQOperation();
-                break;
-            case QUITQ:
-                operation = new QuitQOperation();
-                break;
-            case FLUSHQ:
-                operation = new FlushQOperation();
-                break;
-            case APPENDQ:
-                operation = new AppendQOperation();
-                break;
-            case PREPENDQ:
-                operation = new PrependQOperation();
-                break;
-            default:
-                operation = new NoOpOperation();
-                break;
-        }
+        MemCacheOperation operation = OperationFactory.createOperation(header.getOpCode());
+
         byte data[] = new byte[header.getBodyLength()];
         buffer.readBytes(data);
         MemcacheResponse response = operation.doOperation(myCache, new MemcacheRequest(header, data));

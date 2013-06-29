@@ -17,21 +17,29 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.tangosol.net.NamedCache;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 
 /**
  *
  * @author steve
  */
-class QuitOperation implements MemCacheOperation {
+class GetKQOperation extends GetKOperation {
 
     @Override
     public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
-        responseHeader.setOpCode(OpCode.QUIT);
-        return new MemcacheResponse(responseHeader, null);
+        MemcacheResponse response = super.doOperation(cache, request);
+        response.getHeader().setOpCode(OpCode.GETKQ);
+        if (response.getHeader().getReserved() == ResponseStatus.KEY_NOT_FOUND.status) {
+            response.setDiscard(true);
+        } else {
+            response.setDiscard(false);
+        }
+        return response;
     }
 
     

@@ -37,7 +37,7 @@ public class MemcacheResponse {
         }
     }
     
-    MemcachedBinaryHeader getHeader() {
+    public MemcachedBinaryHeader getHeader() {
         return myHeader;
     }
     

@@ -17,7 +17,7 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.tangosol.net.NamedCache;
 import java.io.ByteArrayInputStream;
@@ -25,13 +25,18 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeader;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 import uk.co.c2b2.memcached.server.CacheEntry;
 
 /**
  *
  * @author steve
  */
-class IncrementOperation implements MemCacheOperation {
+class DecrementOperation implements MemCacheOperation {
 
     @Override
     public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
@@ -58,7 +63,10 @@ class IncrementOperation implements MemCacheOperation {
             if (request.getHeader().getCas() == cas || request.getHeader().getCas() == 0) {
                 cas++;
                 long counter = ByteBuffer.wrap(entry.getValue()).getLong();
-                counter += delta;
+                counter -= delta;
+                if (counter <0) {  // counter should not go below zero
+                    counter = 0;
+                }
                 returnVal = counter;
                 ByteBuffer buff = ByteBuffer.allocate(8);
                 buff.putLong(counter);
@@ -86,13 +94,10 @@ class IncrementOperation implements MemCacheOperation {
             // now way it's a bis
         }        
         // build response
-        responseHeader.setOpCode(OpCode.INCREMENT);
+        responseHeader.setOpCode(OpCode.DECREMENT);
         responseHeader.setCas(cas);
 
-        return new MemcacheResponse(responseHeader, returnArray);
-
-    }
+        return new MemcacheResponse(responseHeader, returnArray);    }
 
 
-    
 }

@@ -17,23 +17,18 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.tangosol.net.NamedCache;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
 
 /**
  *
  * @author steve
  */
-class DeleteQOperation extends DeleteOperation {
+public interface MemCacheOperation {
+    
+    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request);
 
-    @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcacheResponse response = super.doOperation(cache, request);
-        response.getHeader().setOpCode(OpCode.DELETEQ);
-        if (response.getHeader().getReserved() == ResponseStatus.NO_ERROR.status) {
-            response.setDiscard(true);
-        }
-        return response;
-    }
 }
