@@ -35,7 +35,7 @@ public class MemcachedBinaryHeader {
         this.magic = magic;
     }
 
-    MemcachedBinaryHeader(ChannelBuffer buffer) {
+    public MemcachedBinaryHeader(ChannelBuffer buffer) {
         read(buffer);
     }
     

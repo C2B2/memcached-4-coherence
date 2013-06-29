@@ -17,32 +17,32 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.pipeline;
 
-import com.tangosol.net.NamedCache;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
 
 /**
  *
  * @author steve
  */
-public class MemcachedPipelineFactory  implements  ChannelPipelineFactory{
-    
-    private final NamedCache cache;
-
-    public MemcachedPipelineFactory(NamedCache cache) {
-        this.cache = cache;
-    }
+public class MemcachedBinaryProtocolEncoder extends OneToOneEncoder {
 
     @Override
-    public ChannelPipeline getPipeline() throws Exception {
-        ChannelPipeline pipeline = Channels.pipeline();
-        pipeline.addLast("commanddecoder", new MemcachedBinaryProtocolDecoder(cache));
-        pipeline.addLast("commandencoder", new MemcachedBinaryProtocolEncoder());
-        pipeline.addLast("responsehandler", new MemcachedResponseHandler());
-        return pipeline;
+    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
+         
+        if (msg instanceof MemcacheResponse) {
+            MemcacheResponse response = (MemcacheResponse)msg;
+            ChannelBuffer responseBuffer = ChannelBuffers.dynamicBuffer();
+            response.writeToBuffer(responseBuffer);        
+            return responseBuffer;
+        } else {
+            return msg;
+        }
     }
-    
+
 }

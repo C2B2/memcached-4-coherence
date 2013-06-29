@@ -17,16 +17,15 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.pipeline;
 
 import com.tangosol.net.NamedCache;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
-import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.MemCacheOperation;
-import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.OperationFactory;
-import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.SetOperation;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeader;
 
 /**
  *
@@ -34,39 +33,26 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.SetOperati
  */
 public class MemcachedBinaryProtocolDecoder extends FrameDecoder {
     
-    private final NamedCache myCache;
     private static final int HEADER_SIZE = 24;
     
-    public MemcachedBinaryProtocolDecoder(NamedCache cache) {
-        myCache = cache;
-    }
-
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
         // check we have the 
         if (buffer.readableBytes() < HEADER_SIZE) {
             return null;
         }
-        
-        header = new MemcachedBinaryHeader(buffer);
+
+        MemcachedBinaryHeader header = new MemcachedBinaryHeader(buffer);
         
         // ok we've read the header now wait for the body length
         if (buffer.readableBytes() < header.getBodyLength()) {
             return null;
         }
-        
-        MemCacheOperation operation = OperationFactory.createOperation(header.getOpCode());
-
         byte data[] = new byte[header.getBodyLength()];
         buffer.readBytes(data);
-        MemcacheResponse response = operation.doOperation(myCache, new MemcacheRequest(header, data));
-        // always copy back the opaque
-        response.getHeader().setOpaque(header.getOpaque());
 
-        return response;
-        
+        return new MemcacheRequest(header, data);
+
     }
-    
-    private MemcachedBinaryHeader header;
-    
+
 }

@@ -60,7 +60,7 @@ public class MemcacheResponse {
         return myQueue;
     }
     
-    boolean isDiscard() {
+    public boolean isDiscard() {
         return myDiscard;
     }
     

@@ -19,7 +19,7 @@
 */
 package uk.co.c2b2.memcached.server;
 
-import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedPipelineFactory;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.pipeline.MemcachedPipelineFactory;
 import com.tangosol.net.CacheFactory;
 import com.tangosol.net.NamedCache;
 import java.net.InetSocketAddress;
