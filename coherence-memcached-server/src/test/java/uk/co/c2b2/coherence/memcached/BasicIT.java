@@ -20,7 +20,15 @@
 package uk.co.c2b2.coherence.memcached;
 
 
+import java.net.SocketAddress;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import net.spy.memcached.CASMutation;
+import net.spy.memcached.CASMutator;
 import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.transcoders.SerializingTranscoder;
+import net.spy.memcached.transcoders.Transcoder;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -161,5 +169,99 @@ public class BasicIT extends AbstractIntegrationTest {
         assertFalse(deleteResult);       
     }
     
+    @Test
+    public void testIncrement() throws Exception {
+        String key = "testIncrement";
+        long value = client.incr(key, 1, 1, 86000);
+        assertEquals(1, value);
+        value = client.incr(key, 20);
+        assertEquals(21, value);
+    }
     
+    @Test
+    public void testIncrementIncorrectKey() throws Exception {
+        String key = "testIncrementIncorrectKey";
+        long value = client.incr(key, 20);
+        assertEquals(-1, value);       
+    }
+    
+    @Test
+    public void testDecrement() throws Exception {
+        String key = "testDecrement";
+        long value = client.decr(key, 1, 21, 86000);
+        assertEquals(21, value);
+        value = client.decr(key, 20);
+        assertEquals(1, value);
+    }
+    
+    @Test
+    public void testDecrementIncorrectKey() throws Exception {
+         String key = "testDecrementIncorrectKey";
+        long value = client.decr(key, 20);
+        assertEquals(-1, value);       
+    }
+    
+    @Test
+    public void testAppend() throws Exception {
+       String key = "testAppend";
+       String part1 = "Hello";
+       String part2 = " World";
+       client.set(key,10000,part1);
+       String result = (String)client.get(key);
+       assertEquals(result, part1);
+       client.append(key, part2);
+       result = (String)client.get(key);
+       assertEquals(part1 + part2, result);
+    }
+
+    @Test
+    public void testPrepend() throws Exception {
+       String key = "testPrepend";
+       String part1 = "Hello";
+       String part2 = " World";
+       client.set(key,10000,part1);
+       String result = (String)client.get(key);
+       assertEquals(result, part1);
+       client.prepend(key, part2);
+       result = (String)client.get(key);
+       assertEquals(part2 + part1, result);
+    }
+    
+    @Test public void testGetBulk() throws Exception {
+        String key = "testGetBulk";
+        String value = "Value";
+        HashSet<String> keys = new HashSet<String>(100);
+        for (int i = 0; i < 20; i++) {
+            client.set(key+i, 10000, value + i);
+            keys.add(key+i);
+        }
+        
+        Map<String,Object> results = client.getBulk(keys);
+         for (int i = 0; i < 20; i++) {
+            String testValue = (String)results.get(key+i);
+            assertEquals(value+i, testValue);
+        }       
+    }
+    
+    @Test public void testCAS() throws Exception {
+        String key = "testCAS";
+        Transcoder tc = new SerializingTranscoder();
+        CASMutator<String> mutator=new CASMutator<String>(client, tc);
+        CASMutation<String> mutation=new CASMutation<String>() {
+        public String getNewValue(String current) {
+            return current + current;
+            }
+        };
+
+        // Do a mutation.
+       String currentValue=mutator.cas(key, "Wibble", 10000, mutation);
+       currentValue=mutator.cas(key, "Wibble", 10000, mutation);
+       assertEquals("WibbleWibble", currentValue);
+    }
+    
+    @Test public void testVersion() throws Exception {
+        Map<SocketAddress, String> versions = client.getVersions();
+        Set<SocketAddress> keys = versions.keySet();
+        assertEquals(versions.get(keys.toArray()[0]),"1.0.0");
+    }
 }
