@@ -17,7 +17,7 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.google.gson.Gson;
 import com.tangosol.net.NamedCache;
@@ -25,6 +25,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeader;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 import uk.co.c2b2.memcached.server.CacheEntry;
 
 /**

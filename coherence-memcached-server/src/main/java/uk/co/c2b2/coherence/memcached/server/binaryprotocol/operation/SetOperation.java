@@ -17,54 +17,58 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.tangosol.net.NamedCache;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeader;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 import uk.co.c2b2.memcached.server.CacheEntry;
 
 /**
  *
  * @author steve
  */
-class AppendOperation implements MemCacheOperation {
+public class SetOperation implements MemCacheOperation {
 
     @Override
     public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
         long cas = 1;
         MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
+
         try {
         MemcachedBinaryHeader header = request.getHeader();
         ByteArrayInputStream bis = new ByteArrayInputStream(request.getData());
         DataInputStream dis = new DataInputStream(bis);
+        int flags = dis.readInt();
+        int expiry = dis.readInt();
         byte keyArray[] = new byte[header.getKeyLength()];
         dis.read(keyArray);
         String key = new String(keyArray, Charset.defaultCharset());
-        byte value[] = new byte[header.getBodyLength()  - header.getKeyLength()];
+        byte value[] = new byte[header.getBodyLength() - header.getExtraLength() - header.getKeyLength()];
         dis.read(value);
-
+               
+        long lexpiry = expiry * 1000;
         Object object = cache.get(key);
         if (object != null && object instanceof CacheEntry) {
             CacheEntry entry = (CacheEntry)object;
             cas = entry.getCas();
             if (request.getHeader().getCas() == cas || request.getHeader().getCas() == 0) {
                 cas++;
-                byte newValue[] = new byte[entry.getValue().length + value.length];
-                System.arraycopy(entry.getValue(), 0, newValue, 0, entry.getValue().length);
-                System.arraycopy(value, 0, newValue, entry.getValue().length, value.length);
-                
-                entry.setValue(newValue);
-                cache.put(key, entry);
+                cache.put(key, new CacheEntry(flags,value,cas), lexpiry);
                 responseHeader.setStatus(ResponseStatus.NO_ERROR.status);
             } else {
                 responseHeader.setStatus(ResponseStatus.KEY_EXISTS.status);
                 cas = 0;
             }
         } else if (object == null) {
-            cache.put(key, new CacheEntry(0,value,cas), 0);
+            cache.put(key, new CacheEntry(flags,value,cas), lexpiry);
         }
 
 
@@ -72,11 +76,11 @@ class AppendOperation implements MemCacheOperation {
             // now way it's a bis
         }        
         // build response
-        responseHeader.setOpCode(OpCode.APPEND);
+        responseHeader.setOpCode(OpCode.SET);
         responseHeader.setCas(cas);
 
         return new MemcacheResponse(responseHeader, null);
 
     }
-
+    
 }

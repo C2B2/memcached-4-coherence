@@ -17,24 +17,41 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.tangosol.net.NamedCache;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeader;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
+
+import java.nio.charset.Charset;
 
 /**
  *
  * @author steve
  */
-class IncrementQOperation extends IncrementOperation {
+class DeleteOperation implements MemCacheOperation {
 
     @Override
     public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcacheResponse response = super.doOperation(cache, request);
-        response.getHeader().setOpCode(OpCode.INCREMENTQ);
-        if (response.getHeader().getReserved() == ResponseStatus.NO_ERROR.status) {
-            response.setDiscard(true);
+
+
+        MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
+        responseHeader.setOpCode(OpCode.DELETE);
+
+        // decode the key
+        byte keyBytes[] = request.getData();
+        String key = new String(keyBytes, Charset.defaultCharset());
+
+
+        Object objectEntry = cache.get(key);
+        if (objectEntry != null) {
+               cache.remove(key);
+        } else {
+            responseHeader.setStatus(ResponseStatus.KEY_NOT_FOUND.status);
         }
-        return response;
+        return new MemcacheResponse(responseHeader, null);
     }
 
     

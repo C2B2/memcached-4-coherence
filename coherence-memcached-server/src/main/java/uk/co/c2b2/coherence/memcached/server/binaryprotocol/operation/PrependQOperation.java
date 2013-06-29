@@ -17,37 +17,29 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
+package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.tangosol.net.NamedCache;
-import java.nio.charset.Charset;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 
 /**
  *
  * @author steve
  */
-class DeleteOperation implements MemCacheOperation {
+class PrependQOperation extends PrependOperation {
 
     @Override
     public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-
-
-        MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
-        responseHeader.setOpCode(OpCode.DELETE);
-
-        // decode the key
-        byte keyBytes[] = request.getData();
-        String key = new String(keyBytes, Charset.defaultCharset());
-
-
-        Object objectEntry = cache.get(key);
-        if (objectEntry != null) {
-               cache.remove(key);
-        } else {
-            responseHeader.setStatus(ResponseStatus.KEY_NOT_FOUND.status);
+        MemcacheResponse response = super.doOperation(cache, request);
+        response.getHeader().setOpCode(OpCode.PREPENDQ);
+        if (response.getHeader().getReserved() == ResponseStatus.NO_ERROR.status) {
+            response.setDiscard(true);
         }
-        return new MemcacheResponse(responseHeader, null);
+        return response;
     }
+
 
     
 }
