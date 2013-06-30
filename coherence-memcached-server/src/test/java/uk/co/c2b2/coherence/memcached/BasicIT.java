@@ -26,13 +26,11 @@ import java.util.Map;
 import java.util.Set;
 import net.spy.memcached.CASMutation;
 import net.spy.memcached.CASMutator;
-import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static uk.co.c2b2.coherence.memcached.AbstractIntegrationTest.client;
 
 public class BasicIT extends AbstractIntegrationTest {
 
@@ -230,14 +228,14 @@ public class BasicIT extends AbstractIntegrationTest {
     @Test public void testGetBulk() throws Exception {
         String key = "testGetBulk";
         String value = "Value";
-        HashSet<String> keys = new HashSet<String>(100);
-        for (int i = 0; i < 20; i++) {
-            client.set(key+i, 10000, value + i);
+        HashSet<String> keys = new HashSet<String>(200);
+        for (int i = 0; i < 200; i++) {
+            client.set(key+i, 10000, value + i).get();
             keys.add(key+i);
         }
         
         Map<String,Object> results = client.getBulk(keys);
-         for (int i = 0; i < 20; i++) {
+         for (int i = 0; i < 200; i++) {
             String testValue = (String)results.get(key+i);
             assertEquals(value+i, testValue);
         }       

@@ -19,9 +19,9 @@
 */
 package uk.co.c2b2.coherence.memcached;
 
-import net.spy.memcached.BinaryConnectionFactory;
+import net.spy.memcached.ConnectionFactory;
+import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.MemcachedClient;
-import org.junit.Before;
 import uk.co.c2b2.memcached.server.MemcachedServer;
 
 import java.io.IOException;
@@ -34,6 +34,7 @@ public abstract class AbstractIntegrationTest {
 
     private static int DEFAULT_PORT = 10000;
     private static String NAMED_CACHE = "myCache";
+    private static int TIMEOUT = 10000;
 
     protected static MemcachedClient client;
 
@@ -46,7 +47,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     static protected void createClient() throws IOException {
-        BinaryConnectionFactory connectionFactory = new BinaryConnectionFactory();
+        ConnectionFactory connectionFactory = new ConnectionFactoryBuilder().setOpTimeout(TIMEOUT).setProtocol(ConnectionFactoryBuilder.Protocol.BINARY).build();
         client = new MemcachedClient(connectionFactory, Arrays.asList(new InetSocketAddress("localhost", getPort())));
     }
 

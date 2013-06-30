@@ -19,6 +19,8 @@
 */
 package uk.co.c2b2.coherence.memcached.server.binaryprotocol;
 
+import java.util.logging.Logger;
+
 /**
  *
  * @author steve
@@ -40,10 +42,16 @@ public enum MagicByte {
         } else if (val == (byte)0x81) {
             result = RESPONSE;
         }
+        if (BAD.equals(result)) {
+            log.warning("Unknown magic byte: '" + String.format("%02X ", val) + "'");
+        }
         return result;
     }
     
-    
-    byte magicByte;
-    
+    public byte toByte() {
+        return magicByte;
+    }
+
+    private byte magicByte;
+    private static Logger log = Logger.getLogger(MagicByte.class.getName());
 }

@@ -19,13 +19,14 @@
 */
 package uk.co.c2b2.coherence.memcached.server.binaryprotocol.pipeline;
 
-import com.tangosol.net.NamedCache;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeader;
+
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,25 +35,30 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeade
 public class MemcachedBinaryProtocolDecoder extends FrameDecoder {
     
     private static final int HEADER_SIZE = 24;
-    
+
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
-        // check we have the 
+        // check we have the
         if (buffer.readableBytes() < HEADER_SIZE) {
             return null;
         }
+        buffer.markReaderIndex();
 
         MemcachedBinaryHeader header = new MemcachedBinaryHeader(buffer);
-        
+
         // ok we've read the header now wait for the body length
         if (buffer.readableBytes() < header.getBodyLength()) {
+            log.fine("Not enough data in buffer, waiting for more...");
+            buffer.resetReaderIndex();
             return null;
         }
         byte data[] = new byte[header.getBodyLength()];
         buffer.readBytes(data);
 
+
         return new MemcacheRequest(header, data);
 
     }
 
+    private Logger log = Logger.getLogger(this.getClass().getName());
 }

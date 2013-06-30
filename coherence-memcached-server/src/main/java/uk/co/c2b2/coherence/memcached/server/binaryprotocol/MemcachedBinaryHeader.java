@@ -40,7 +40,7 @@ public class MemcachedBinaryHeader {
     }
     
     public void write(ChannelBuffer buffer) {
-        buffer.writeByte(magic.magicByte);
+        buffer.writeByte(magic.toByte());
         buffer.writeByte(opCode.toByte());
         buffer.writeShort(keyLength);
         buffer.writeByte(extraLength);

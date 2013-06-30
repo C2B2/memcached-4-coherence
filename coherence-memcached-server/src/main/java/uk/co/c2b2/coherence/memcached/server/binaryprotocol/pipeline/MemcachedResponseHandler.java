@@ -28,6 +28,9 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author steve
@@ -63,6 +66,9 @@ public class MemcachedResponseHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        log.log(Level.SEVERE, "Protocol Error. ", e.getCause());
         super.exceptionCaught(ctx, e); //To change body of generated methods, choose Tools | Templates.
     }
+
+    private Logger log = Logger.getLogger(MemcachedResponseHandler.class.getName());
 }
