@@ -31,6 +31,7 @@ import net.spy.memcached.transcoders.Transcoder;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static uk.co.c2b2.coherence.memcached.AbstractIntegrationTest.client;
 
 public class BasicIT extends AbstractIntegrationTest {
 
@@ -177,6 +178,14 @@ public class BasicIT extends AbstractIntegrationTest {
     }
     
     @Test
+    public void testIncrementBadKey() throws Exception {
+        String key = "testIncrementBadKey";
+        client.set(key, 10000, "NonNumeric");
+        long value = client.incr(key, 1);
+        assertEquals(-1, value);
+    }
+    
+    @Test
     public void testIncrementIncorrectKey() throws Exception {
         String key = "testIncrementIncorrectKey";
         long value = client.incr(key, 20);
@@ -190,6 +199,14 @@ public class BasicIT extends AbstractIntegrationTest {
         assertEquals(21, value);
         value = client.decr(key, 20);
         assertEquals(1, value);
+    }
+    
+    @Test
+    public void testDecrementBadKey() throws Exception {
+        String key = "testDecrementBadKey";
+        client.set(key, 10000, "NonNumeric");
+        long value = client.decr(key, 1);
+        assertEquals(-1, value);
     }
     
     @Test
