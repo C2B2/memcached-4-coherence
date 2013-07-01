@@ -119,7 +119,7 @@ class GetOperation implements MemCacheOperation {
     private byte[] serializeToJSON(Object object) {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(object);
-        return jsonStr.getBytes();
+        return jsonStr.getBytes(Charset.forName("UTF-8"));
     }
     
     protected boolean keyRequired = false;

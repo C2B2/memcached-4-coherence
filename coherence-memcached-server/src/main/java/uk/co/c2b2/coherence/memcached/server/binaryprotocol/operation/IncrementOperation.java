@@ -60,7 +60,7 @@ class IncrementOperation implements MemCacheOperation {
             int expiration = dis.readInt();
             byte keyArray[] = new byte[header.getKeyLength()];
             dis.read(keyArray);
-            String key = new String(keyArray, Charset.defaultCharset());
+            String key = new String(keyArray, CHARSET);
             
             Object object = cache.get(key);
             if (object != null && object instanceof CacheEntry) {
@@ -75,7 +75,7 @@ class IncrementOperation implements MemCacheOperation {
                         ByteBuffer buff = ByteBuffer.allocate(8);
                         buff.putLong(counter);
                         returnArray = buff.array();
-                        cache.put(key, new CacheEntry(header.getOpaque(),Long.toString(counter).getBytes(),cas), expiration);
+                        cache.put(key, new CacheEntry(header.getOpaque(),Long.toString(counter).getBytes(CHARSET),cas), expiration);
                         responseHeader.setStatus(ResponseStatus.NO_ERROR.status);
                     } catch (NumberFormatException nfe) {
                         responseHeader.setStatus(ResponseStatus.NON_NUMERIC.status);
@@ -86,7 +86,7 @@ class IncrementOperation implements MemCacheOperation {
                 }
             } else if (object == null) {
                 if (expiration != 0xffffffff) {
-                    cache.put(key, new CacheEntry(header.getOpaque(), Long.toString(initial).getBytes(), cas), expiration);
+                    cache.put(key, new CacheEntry(header.getOpaque(), Long.toString(initial).getBytes(CHARSET), cas), expiration);
                     responseHeader.setStatus(ResponseStatus.NO_ERROR.status);
                     ByteBuffer buff = ByteBuffer.allocate(8);
                     buff.putLong(initial);

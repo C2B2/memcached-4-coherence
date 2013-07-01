@@ -20,6 +20,7 @@
 package uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation;
 
 import com.tangosol.net.NamedCache;
+import java.nio.charset.Charset;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
 
@@ -28,6 +29,8 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
  * @author steve
  */
 public interface MemCacheOperation {
+    
+    public static Charset CHARSET = Charset.forName("UTF-8");
     
     public MemcacheResponse doOperation(MemcacheRequest request);
 

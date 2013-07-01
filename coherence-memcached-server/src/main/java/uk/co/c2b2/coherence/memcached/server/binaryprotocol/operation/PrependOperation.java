@@ -23,7 +23,6 @@ import com.tangosol.net.NamedCache;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheRequest;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
@@ -53,7 +52,7 @@ class PrependOperation implements MemCacheOperation {
         DataInputStream dis = new DataInputStream(bis);
         byte keyArray[] = new byte[header.getKeyLength()];
         dis.read(keyArray);
-        String key = new String(keyArray, Charset.defaultCharset());
+        String key = new String(keyArray, CHARSET);
         byte value[] = new byte[header.getBodyLength()  - header.getKeyLength()];
         dis.read(value);
 

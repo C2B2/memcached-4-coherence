@@ -56,7 +56,7 @@ class ReplaceOperation implements MemCacheOperation {
             int expiry = dis.readInt();
             byte keyArray[] = new byte[header.getKeyLength()];
             dis.read(keyArray);
-            String key = new String(keyArray, Charset.defaultCharset());
+            String key = new String(keyArray, CHARSET);
             byte value[] = new byte[header.getBodyLength() - header.getExtraLength() - header.getKeyLength()];
             dis.read(value);
 

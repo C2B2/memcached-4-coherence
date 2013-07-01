@@ -56,11 +56,10 @@ class DecrementOperation implements MemCacheOperation {
             DataInputStream dis = new DataInputStream(bis);
             long delta = dis.readLong();
             long initial = dis.readLong();
-            long returnVal = initial;
             int expiration = dis.readInt();
             byte keyArray[] = new byte[header.getKeyLength()];
             dis.read(keyArray);
-            String key = new String(keyArray, Charset.defaultCharset());
+            String key = new String(keyArray,CHARSET);
             
             Object object = cache.get(key);
             if (object != null && object instanceof CacheEntry) {
@@ -74,10 +73,9 @@ class DecrementOperation implements MemCacheOperation {
                         if (counter < 0) {  // counter should not go below zero
                             counter = 0;
                         }
-                        returnVal = counter;
-                        cache.put(key, new CacheEntry(header.getOpaque(), Long.toString(counter).getBytes(), cas), expiration);
+                        cache.put(key, new CacheEntry(header.getOpaque(), Long.toString(counter).getBytes(CHARSET), cas), expiration);
                         ByteBuffer buff = ByteBuffer.allocate(8);
-                        buff.putLong(returnVal);
+                        buff.putLong(counter);
                         returnArray = buff.array();
                         responseHeader.setStatus(ResponseStatus.NO_ERROR.status);
                     } catch (NumberFormatException nfe) {
@@ -89,7 +87,7 @@ class DecrementOperation implements MemCacheOperation {
                 }
             } else if (object == null) {
                 if (expiration != 0xffffffff) {
-                    cache.put(key, new CacheEntry(header.getOpaque(),Long.toString(initial).getBytes(), cas), expiration);
+                    cache.put(key, new CacheEntry(header.getOpaque(),Long.toString(initial).getBytes(CHARSET), cas), expiration);
                     responseHeader.setStatus(ResponseStatus.NO_ERROR.status);
                     ByteBuffer buff = ByteBuffer.allocate(8);
                     buff.putLong(initial);

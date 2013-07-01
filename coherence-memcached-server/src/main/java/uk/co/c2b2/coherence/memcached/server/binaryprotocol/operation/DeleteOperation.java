@@ -25,7 +25,6 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcachedBinaryHeader;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
 
-import java.nio.charset.Charset;
 
 /**
  *
@@ -49,7 +48,7 @@ class DeleteOperation implements MemCacheOperation {
 
         // decode the key
         byte keyBytes[] = request.getData();
-        String key = new String(keyBytes, Charset.defaultCharset());
+        String key = new String(keyBytes, CHARSET);
 
 
         Object objectEntry = cache.get(key);
