@@ -30,9 +30,13 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class SetQOperation extends  SetOperation {
 
+    SetQOperation(NamedCache cache) {
+        super(cache);
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcacheResponse response = super.doOperation(cache, request);
+    public MemcacheResponse doOperation(MemcacheRequest request) {
+        MemcacheResponse response = super.doOperation(request);
         response.getHeader().setOpCode(OpCode.SETQ);
         if (response.getHeader().getReserved() == ResponseStatus.NO_ERROR.status) {
             response.setDiscard(true);

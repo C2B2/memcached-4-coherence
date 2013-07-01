@@ -29,10 +29,10 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.OperationF
 
 public class MemcacheRequestToResponseDecoder extends OneToOneDecoder {
 
-    private final NamedCache myCache;
+    private final OperationFactory operationFactory;
 
-    public MemcacheRequestToResponseDecoder(NamedCache myCache) {
-        this.myCache = myCache;
+    public MemcacheRequestToResponseDecoder(OperationFactory operationFactory) {
+        this.operationFactory = operationFactory;
     }
 
     @Override
@@ -40,8 +40,8 @@ public class MemcacheRequestToResponseDecoder extends OneToOneDecoder {
             ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
         MemcacheRequest request = (MemcacheRequest)msg;
 
-        MemCacheOperation operation = OperationFactory.createOperation(request.getHeader().getOpCode());
-        MemcacheResponse response = operation.doOperation(myCache, request);
+        MemCacheOperation operation = operationFactory.createOperation(request.getHeader().getOpCode());
+        MemcacheResponse response = operation.doOperation(request);
         // always copy back the opaque
         response.getHeader().setOpaque(request.getHeader().getOpaque());
 

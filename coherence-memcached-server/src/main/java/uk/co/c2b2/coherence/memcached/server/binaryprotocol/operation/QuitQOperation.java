@@ -30,9 +30,13 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class QuitQOperation extends QuitOperation {
 
+    QuitQOperation(NamedCache cache) {
+        super(cache);
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcacheResponse response = super.doOperation(cache, request);
+    public MemcacheResponse doOperation(MemcacheRequest request) {
+        MemcacheResponse response = super.doOperation(request);
         response.setDiscard(true);
         response.getHeader().setOpCode(OpCode.QUITQ);
         return response;

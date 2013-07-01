@@ -31,8 +31,13 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class StatOperation implements MemCacheOperation {
 
+
+    StatOperation(NamedCache cache) {
+        //ignored
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
+    public MemcacheResponse doOperation(MemcacheRequest request) {
         MemcacheResponse response =  new MemcacheResponse(new MemcachedBinaryHeader(),null);
         response.getHeader().setOpCode(OpCode.STAT);
         response.getHeader().setStatus(ResponseStatus.NO_ERROR.status);

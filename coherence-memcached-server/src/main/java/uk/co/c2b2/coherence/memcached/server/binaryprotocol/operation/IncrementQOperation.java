@@ -30,9 +30,13 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class IncrementQOperation extends IncrementOperation {
 
+    IncrementQOperation(NamedCache cache) {
+        super(cache);
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcacheResponse response = super.doOperation(cache, request);
+    public MemcacheResponse doOperation(MemcacheRequest request) {
+        MemcacheResponse response = super.doOperation(request);
         response.getHeader().setOpCode(OpCode.INCREMENTQ);
         if (response.getHeader().getReserved() == ResponseStatus.NO_ERROR.status) {
             response.setDiscard(true);

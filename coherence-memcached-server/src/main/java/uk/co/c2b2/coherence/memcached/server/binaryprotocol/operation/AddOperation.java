@@ -37,8 +37,14 @@ import uk.co.c2b2.memcached.server.CacheEntry;
  */
 class AddOperation implements MemCacheOperation {
 
+    private final NamedCache cache;
+
+    AddOperation(NamedCache cache) {
+        this.cache = cache;
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
+    public MemcacheResponse doOperation(MemcacheRequest request) {
         
         MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
         responseHeader.setOpCode(OpCode.ADD);

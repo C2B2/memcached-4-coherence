@@ -41,8 +41,14 @@ import java.util.logging.Logger;
  */
 class FlushOperation implements MemCacheOperation {
 
+    private final NamedCache cache;
+
+    FlushOperation(NamedCache cache) {
+        this.cache = cache;
+    }
+
     @Override
-    public MemcacheResponse doOperation(final NamedCache cache, MemcacheRequest request) {
+    public MemcacheResponse doOperation(MemcacheRequest request) {
         MemcachedBinaryHeader header = new MemcachedBinaryHeader();
         header.setOpCode(OpCode.FLUSH);
         int expiry = 0;

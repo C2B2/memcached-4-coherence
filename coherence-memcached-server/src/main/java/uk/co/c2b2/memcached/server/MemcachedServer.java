@@ -19,6 +19,7 @@
 */
 package uk.co.c2b2.memcached.server;
 
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.OperationFactory;
 import uk.co.c2b2.coherence.memcached.server.binaryprotocol.pipeline.MemcachedPipelineFactory;
 import com.tangosol.net.CacheFactory;
 import com.tangosol.net.NamedCache;
@@ -95,9 +96,11 @@ public class MemcachedServer {
     }
     
     void bootStrapSocketServer() {
+        OperationFactory operationFactory = new OperationFactory(myCache);
+
         ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool());
         ServerBootstrap bootstrap = new ServerBootstrap(factory);
-        bootstrap.setPipelineFactory(new MemcachedPipelineFactory(myCache));
+        bootstrap.setPipelineFactory(new MemcachedPipelineFactory(operationFactory));
         bootstrap.setOption("child.tcpNoDelay", true);
         bootstrap.setOption("child.keepAlive", true);
         bootstrap.bind(new InetSocketAddress(myPort));

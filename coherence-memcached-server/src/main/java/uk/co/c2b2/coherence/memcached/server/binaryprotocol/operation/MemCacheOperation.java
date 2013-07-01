@@ -29,6 +29,6 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.MemcacheResponse;
  */
 public interface MemCacheOperation {
     
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request);
+    public MemcacheResponse doOperation(MemcacheRequest request);
 
 }

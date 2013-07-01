@@ -23,6 +23,7 @@ import com.tangosol.net.NamedCache;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import uk.co.c2b2.coherence.memcached.server.binaryprotocol.operation.OperationFactory;
 
 /**
  *
@@ -30,17 +31,17 @@ import org.jboss.netty.channel.Channels;
  */
 public class MemcachedPipelineFactory  implements  ChannelPipelineFactory{
     
-    private final NamedCache cache;
+    private final OperationFactory operationFactory;
 
-    public MemcachedPipelineFactory(NamedCache cache) {
-        this.cache = cache;
+    public MemcachedPipelineFactory(OperationFactory operationFactory) {
+        this.operationFactory = operationFactory;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline pipeline = Channels.pipeline();
         pipeline.addLast("commanddecoder", new MemcachedBinaryProtocolDecoder());
-        pipeline.addLast("requestHandler", new MemcacheRequestToResponseDecoder(cache));
+        pipeline.addLast("requestHandler", new MemcacheRequestToResponseDecoder(operationFactory));
         pipeline.addLast("responsehandler", new MemcachedResponseHandler());
         pipeline.addLast("commandencoder", new MemcachedBinaryProtocolEncoder());
         return pipeline;

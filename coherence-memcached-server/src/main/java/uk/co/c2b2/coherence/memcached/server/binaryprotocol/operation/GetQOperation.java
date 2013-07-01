@@ -30,9 +30,13 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class GetQOperation extends GetOperation {
 
+    GetQOperation(NamedCache cache) {
+        super(cache);
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
-        MemcacheResponse response = super.doOperation(cache, request);
+    public MemcacheResponse doOperation(MemcacheRequest request) {
+        MemcacheResponse response = super.doOperation(request);
         response.getHeader().setOpCode(OpCode.GETQ);
         response.setQueue(true);
         if (response.getHeader().getReserved() == ResponseStatus.KEY_NOT_FOUND.status) {

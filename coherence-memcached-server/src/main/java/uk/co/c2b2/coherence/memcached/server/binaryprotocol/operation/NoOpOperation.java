@@ -31,8 +31,13 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class NoOpOperation implements MemCacheOperation {
 
+
+    NoOpOperation(NamedCache myCache) {
+        //ignored
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
+    public MemcacheResponse doOperation(MemcacheRequest request) {
         
         MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
         responseHeader.setOpCode(OpCode.NOOP);

@@ -31,8 +31,12 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class QuitOperation implements MemCacheOperation {
 
+    QuitOperation(NamedCache cache) {
+        //ignored
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
+    public MemcacheResponse doOperation(MemcacheRequest request) {
         MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
         responseHeader.setOpCode(OpCode.QUIT);
         return new MemcacheResponse(responseHeader, null);

@@ -30,10 +30,14 @@ import uk.co.c2b2.coherence.memcached.server.binaryprotocol.OpCode;
  */
 class GetKOperation extends GetOperation {
 
+    GetKOperation(NamedCache cache) {
+        super(cache);
+    }
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
+    public MemcacheResponse doOperation(MemcacheRequest request) {
         keyRequired = true;
-        MemcacheResponse response = super.doOperation(cache, request);
+        MemcacheResponse response = super.doOperation(request);
         response.getHeader().setOpCode(OpCode.GETK);
         return response;
     }

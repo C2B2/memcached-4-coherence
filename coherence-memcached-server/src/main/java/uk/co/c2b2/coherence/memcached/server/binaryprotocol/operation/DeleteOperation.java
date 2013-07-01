@@ -33,8 +33,15 @@ import java.nio.charset.Charset;
  */
 class DeleteOperation implements MemCacheOperation {
 
+    private final NamedCache cache;
+
+    DeleteOperation(NamedCache cache) {
+        this.cache = cache;
+    }
+
+
     @Override
-    public MemcacheResponse doOperation(NamedCache cache, MemcacheRequest request) {
+    public MemcacheResponse doOperation(MemcacheRequest request) {
 
 
         MemcachedBinaryHeader responseHeader = new MemcachedBinaryHeader();
