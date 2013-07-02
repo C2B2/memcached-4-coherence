@@ -85,6 +85,11 @@ public class MemcachedServer {
         if (myLogger.isLoggable(Level.INFO))
           myLogger.info("Bootstrapped Memcached server on port " + myPort + " backed by named cache " + myNamedCache);
     }
+
+    public void shutdown() {
+        channelFactory.releaseExternalResources();
+        CacheFactory.shutdown();
+    }
     
     public NamedCache getCache() {
         return myCache;
@@ -98,16 +103,18 @@ public class MemcachedServer {
     void bootStrapSocketServer() {
         OperationFactory operationFactory = new OperationFactory(myCache);
 
-        ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool());
-        ServerBootstrap bootstrap = new ServerBootstrap(factory);
+        channelFactory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool());
+        ServerBootstrap bootstrap = new ServerBootstrap(channelFactory);
         bootstrap.setPipelineFactory(new MemcachedPipelineFactory(operationFactory));
         bootstrap.setOption("child.tcpNoDelay", true);
         bootstrap.setOption("child.keepAlive", true);
         bootstrap.bind(new InetSocketAddress(myPort));
     }
-    
+
     private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private int myPort;
     private String myNamedCache;
     private NamedCache myCache;
+
+    private ChannelFactory channelFactory;
 }
