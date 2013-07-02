@@ -19,14 +19,22 @@
 */
 package uk.co.c2b2.memcached.server;
 
+import com.tangosol.io.pof.PofReader;
+import com.tangosol.io.pof.PofWriter;
+import com.tangosol.io.pof.PortableObject;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
  *
  * @author steve
  */
-public class CacheEntry implements Serializable {
-
+public class CacheEntry implements Serializable, PortableObject {
+    
+    public static final int VALUE = 0;
+    public static final int CAS = 1;
+    public static final int FLAGS =2;
+    
     public CacheEntry(int flags, byte[] value, long cas) {
         this.value = value;
         this.cas = cas;
@@ -59,8 +67,20 @@ public class CacheEntry implements Serializable {
         return result.toString();
     }
     
+    public void readExternal(PofReader reader) throws IOException {
+       value = reader.readByteArray(VALUE);
+       cas = reader.readLong(CAS);
+       flags = reader.readInt(FLAGS);
+    }
+
+    public void writeExternal(PofWriter writer) throws IOException {
+        writer.writeByteArray(VALUE, value);
+        writer.writeLong(CAS, cas);
+        writer.writeInt(FLAGS, flags);
+    }
+    
+    
     private byte value[];
     private long cas;
     private int flags;
-    
 }
